@@ -1,6 +1,5 @@
 ## INTRODUCTION
 
-[![Build Status](https://travis-ci.org/sddm/sddm.svg?branch=master)](https://travis-ci.org/sddm/sddm)
 [![IRC Network](https://img.shields.io/badge/irc-freenode-blue.svg "IRC Freenode")](https://webchat.freenode.net/?channels=sddm)
 
 SDDM is a modern display manager for X11 and Wayland aiming to be fast, simple and beautiful.
@@ -16,9 +15,6 @@ a combox etc.
 
 There are a few sample themes distributed with SDDM.
 They can be used as a starting point for new themes.
-
-SDDM is developed by volunteers, please consider [donating](https://www.bountysource.com/teams/sddm)
-money that can be used to support the features that you most desire.
 
 ## SCREENSHOTS
 

@@ -267,6 +267,7 @@ namespace SDDM {
     }
 
     Auth::~Auth() {
+        stop();
         delete d;
     }
 
@@ -374,7 +375,7 @@ namespace SDDM {
     void Auth::start() {
         QStringList args;
         args << QStringLiteral("--socket") << SocketServer::instance()->fullServerName();
-        args << QStringLiteral("--id") << QStringLiteral("%1").arg(d->id);
+        args << QStringLiteral("--id") << QString::number(d->id);
         if (!d->sessionPath.isEmpty())
             args << QStringLiteral("--start") << d->sessionPath;
         if (!d->user.isEmpty())
@@ -389,6 +390,10 @@ namespace SDDM {
     }
 
     void Auth::stop() {
+        if (d->child->state() == QProcess::NotRunning) {
+            return;
+        }
+
         d->child->terminate();
 
         // wait for finished

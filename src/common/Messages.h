@@ -43,7 +43,8 @@ namespace SDDM {
         PamConvMsg,
         PamRequest,
         LoginSucceeded,
-        LoginFailed
+        LoginFailed,
+        InformationMessage,
     };
 
     enum Capability {

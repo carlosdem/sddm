@@ -72,6 +72,10 @@ Rectangle {
             else // filter out login failure details
                 errorMessage.text = textConstants.loginFailed
         }
+        onInformationMessage: {
+            errorMessage.color = "red"
+            errorMessage.text = message
+        }
     }
 
     Background {

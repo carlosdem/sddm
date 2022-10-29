@@ -171,6 +171,8 @@ namespace SDDM {
     void GreeterProxy::disconnected() {
         // log disconnection
         qDebug() << "Disconnected from the daemon.";
+
+        Q_EMIT socketDisconnected();
     }
 
     void GreeterProxy::error() {
@@ -238,6 +240,13 @@ namespace SDDM {
                     qDebug() << "Message received from daemon: LoginFailed, " << m << ", rc =" << rc;
                     // emit signal
                     emit loginFailed(m, rc);
+                }
+                case DaemonMessages::InformationMessage: {
+                    QString message;
+                    input >> message;
+
+                    qDebug() << "Information Message received from daemon: " << message;
+                    emit informationMessage(message);
                 }
                 break;
                 // pam messages from conv() following login, e.g. for expired pwd

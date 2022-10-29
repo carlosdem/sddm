@@ -75,6 +75,10 @@ Rectangle {
             else // filter out login failure details
                 txtMessage.text = textConstants.loginFailed
         }
+
+        onInformationMessage: {
+            txtMessage.text = message
+        }
     }
 
     Background {

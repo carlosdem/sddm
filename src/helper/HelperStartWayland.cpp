@@ -26,8 +26,11 @@
 #include <unistd.h>
 #include <QCoreApplication>
 #include <QTextStream>
+#include <QDebug>
 #include "waylandhelper.h"
 #include "MessageHandler.h"
+#include <signal.h>
+#include "SignalHandler.h"
 
 void WaylandHelperMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     SDDM::messageHandler(type, context, QStringLiteral("WaylandHelper: "), msg);
@@ -36,8 +39,10 @@ void WaylandHelperMessageHandler(QtMsgType type, const QMessageLogContext &conte
 int main(int argc, char** argv)
 {
     qInstallMessageHandler(WaylandHelperMessageHandler);
-    Q_ASSERT(::getuid() != 0);
     QCoreApplication app(argc, argv);
+    SDDM::SignalHandler s;
+
+    Q_ASSERT(::getuid() != 0);
     if (argc != 3) {
         QTextStream(stderr) << "Wrong number of arguments\n";
         return 1;
@@ -45,6 +50,9 @@ int main(int argc, char** argv)
 
     using namespace SDDM;
     WaylandHelper helper;
+    QObject::connect(&s, &SDDM::SignalHandler::sigtermReceived, &app, [] {
+        QCoreApplication::exit(0);
+    });
     QObject::connect(&app, &QCoreApplication::aboutToQuit, &helper, [&helper] {
         qDebug("quitting helper-start-wayland");
         helper.stop();
@@ -54,7 +62,10 @@ int main(int argc, char** argv)
         app.exit(2);
     });
 
-    helper.startCompositor(app.arguments()[1]);
+    if (!helper.startCompositor(app.arguments()[1])) {
+        qWarning() << "SDDM was unable to start" << app.arguments()[1];
+        return 3;
+    }
     helper.startGreeter(app.arguments()[2]);
     return app.exec();
 }

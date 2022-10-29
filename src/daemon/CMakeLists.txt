@@ -16,6 +16,7 @@ set(DAEMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/XAuth.cpp
     ${CMAKE_SOURCE_DIR}/src/common/XAuth.h
     ${CMAKE_SOURCE_DIR}/src/common/Utils.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/SignalHandler.cpp
     ${CMAKE_SOURCE_DIR}/src/auth/Auth.cpp
     ${CMAKE_SOURCE_DIR}/src/auth/AuthPrompt.cpp
     ${CMAKE_SOURCE_DIR}/src/auth/AuthRequest.cpp
@@ -29,7 +30,6 @@ set(DAEMON_SOURCES
     PowerManager.cpp
     Seat.cpp
     SeatManager.cpp
-    SignalHandler.cpp
     SocketServer.cpp
     XorgDisplayServer.cpp
     XorgUserDisplayServer.cpp

@@ -234,4 +234,8 @@ namespace SDDM {
             SocketWriter(socket) << quint32(DaemonMessages::PamRequest) << request;
         }
     }
+
+    void SocketServer::informationMessage(QLocalSocket *socket, const QString &message) {
+        SocketWriter(socket) << quint32(DaemonMessages::InformationMessage) << message;
+    }
 }

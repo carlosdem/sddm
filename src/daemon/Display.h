@@ -23,6 +23,7 @@
 #define SDDM_DISPLAY_H
 
 #include <QObject>
+#include <QPointer>
 #include <QDir>
 
 #include "Auth.h"
@@ -95,9 +96,7 @@ namespace SDDM {
         bool m_started { false };
         bool m_failed { false };
 
-        int m_terminalId { 7 };
-
-        Session m_lastSession;
+        int m_terminalId = 0;
 
         QString m_passPhrase;
         QString m_sessionName;
@@ -107,7 +106,7 @@ namespace SDDM {
         DisplayServer *m_displayServer { nullptr };
         Seat *m_seat { nullptr };
         SocketServer *m_socketServer { nullptr };
-        QLocalSocket *m_socket { nullptr };
+        QPointer<QLocalSocket> m_socket;
         Greeter *m_greeter { nullptr };
 
     private slots:

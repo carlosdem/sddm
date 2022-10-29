@@ -58,6 +58,8 @@ Rectangle {
         target: sddm
         onLoginSucceeded: {
         }
+        onInformationMessage: {
+        }
         onLoginFailed: {
             pw_entry.forceActiveFocus()
             pw_entry.text = ""

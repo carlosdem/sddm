@@ -41,6 +41,10 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <linux/vt.h>
+
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusReply>
@@ -52,6 +56,35 @@
 
 
 namespace SDDM {
+    bool isTtyInUse(const QString &desiredTty) {
+        if (Logind::isAvailable()) {
+            OrgFreedesktopLogin1ManagerInterface manager(Logind::serviceName(), Logind::managerPath(), QDBusConnection::systemBus());
+            auto reply = manager.ListSessions();
+            reply.waitForFinished();
+
+            const auto info = reply.value();
+            for(const SessionInfo &s : info) {
+                OrgFreedesktopLogin1SessionInterface session(Logind::serviceName(), s.sessionPath.path(), QDBusConnection::systemBus());
+                if (desiredTty == session.tTY() && session.state() != QLatin1String("closing")) {
+                    qDebug() << "tty" << desiredTty << "already in use by" << session.user().path << session.state()
+                                      << session.display() << session.desktop() << session.vTNr();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    int fetchAvailableVt() {
+        const auto vt = VirtualTerminal::currentVt();
+        if (vt > 0) {
+            if (!isTtyInUse(QStringLiteral("tty%1").arg(vt))) {
+                return vt;
+            }
+        }
+        return VirtualTerminal::setUpNewVt();
+    }
+
     Display::Display(Seat *parent) : QObject(parent),
         m_auth(new Auth(this)),
         m_seat(parent),
@@ -61,17 +94,18 @@ namespace SDDM {
 
         // Save display server type
         const QString &displayServerType = mainConfig.DisplayServer.get().toLower();
-        if (displayServerType == QLatin1String("x11")) {
-            // Allocate vt
-            m_terminalId = VirtualTerminal::setUpNewVt();
-            m_displayServerType = X11DisplayServerType;
-        } else if (displayServerType == QStringLiteral("x11-user"))
+        if (displayServerType == QStringLiteral("x11-user")) {
             m_displayServerType = X11UserDisplayServerType;
-        else if (displayServerType == QStringLiteral("wayland"))
+            m_terminalId = fetchAvailableVt();
+        } else if (displayServerType == QStringLiteral("wayland")) {
             m_displayServerType = WaylandDisplayServerType;
-        else {
-            qWarning("\"%s\" is an invalid value for General.DisplayServer: fall back to \"x11\"",
+            m_terminalId = fetchAvailableVt();
+        } else {
+            if (displayServerType != QLatin1String("x11")) {
+                qWarning("\"%s\" is an invalid value for General.DisplayServer: fall back to \"x11\"",
                      qPrintable(displayServerType));
+            }
+            m_terminalId = VirtualTerminal::setUpNewVt();
             m_displayServerType = X11DisplayServerType;
         }
 
@@ -90,10 +124,7 @@ namespace SDDM {
             break;
         }
 
-        // Print what VT we are using for more information
-        if (m_terminalId > 0) {
-            qDebug("Using VT %d", m_terminalId);
-        }
+        qDebug("Using VT %d", m_terminalId);
 
         connect(m_greeter, &Greeter::stopped, this, &Display::slotGreeterStopped);
 
@@ -128,6 +159,11 @@ namespace SDDM {
         connect(this, &Display::pamConvMsg, m_socketServer, &SocketServer::pamConvMsg);
         // new request from pam for e.g. password renewal (expired password)
         connect(this, &Display::pamRequest, m_socketServer, &SocketServer::pamRequest);
+
+        connect(m_greeter, &Greeter::failed,
+                QCoreApplication::instance(), [] {
+                    QCoreApplication::instance()->exit(23);
+                });
     }
 
     Display::~Display() {
@@ -382,23 +418,18 @@ namespace SDDM {
             }
         }
 
-        // cache last session
-        m_lastSession = session;
-
         // save session desktop file name, we'll use it to set the
         // last session later, in slotAuthenticationFinished()
         m_sessionName = session.fileName();
 
-        // New VT
-        if (session.xdgSessionType() != QLatin1String("x11") || m_displayServerType != X11DisplayServerType) {
-            if (m_displayServerType == X11DisplayServerType)
-                m_lastSession.setVt(VirtualTerminal::setUpNewVt());
-            else
-                m_lastSession.setVt(VirtualTerminal::fetchAvailableVt());
+        int terminalNewSession = m_terminalId;
+        if ((session.type() == Session::WaylandSession && m_displayServerType == X11DisplayServerType) || (m_greeter->isRunning() && m_displayServerType != X11DisplayServerType)) {
+            // Create a new VT when we need to have another compositor running
+            terminalNewSession = VirtualTerminal::setUpNewVt();
         }
 
         // some information
-        qDebug() << "Session" << m_sessionName << "selected, command:" << session.exec() << "for VT" << m_lastSession.vt();
+        qDebug() << "Session" << m_sessionName << "selected, command:" << session.exec() << "for VT" << terminalNewSession;
 
         QProcessEnvironment env;
         env.insert(session.additionalEnv());
@@ -412,7 +443,7 @@ namespace SDDM {
         env.insert(QStringLiteral("XDG_SESSION_CLASS"), QStringLiteral("user"));
         env.insert(QStringLiteral("XDG_SESSION_TYPE"), session.xdgSessionType());
         env.insert(QStringLiteral("XDG_SEAT"), seat()->name());
-        env.insert(QStringLiteral("XDG_VTNR"), QString::number(m_lastSession.vt()));
+        env.insert(QStringLiteral("XDG_VTNR"), QString::number(terminalNewSession));
 #ifdef HAVE_SYSTEMD
         env.insert(QStringLiteral("XDG_SESSION_DESKTOP"), session.desktopNames());
 #endif
@@ -430,7 +461,6 @@ namespace SDDM {
             m_auth->setSession(session.exec());
         }
         m_auth->insertEnvironment(env);
-
         m_auth->start();
     }
 
@@ -484,6 +514,8 @@ namespace SDDM {
                                        << "\", type = " << Utils::authInfoString(info)
                                        << ", result = " << Utils::pamResultString(result)
                                        << " (rc=" << result << ")";
+    void Display::slotAuthInfo(const QString &message, Auth::Info info) {
+        qWarning() << "Authentication information:" << info << message;
 
         if(!m_socket) {
             qWarning() << "Greeter socket down";
@@ -495,6 +527,18 @@ namespace SDDM {
             // send pam conversation message to greeter
             emit pamConvMsg(m_socket, message, result);
         }
+        m_socketServer->informationMessage(m_socket, message);
+    }
+
+    void Display::slotAuthError(const QString &message, Auth::Error error) {
+        qWarning() << "Authentication error:" << error << message;
+
+        if (!m_socket)
+            return;
+
+        m_socketServer->informationMessage(m_socket, message);
+        if (error == Auth::ERROR_AUTHENTICATION)
+            emit loginFailed(m_socket);
     }
 
     void Display::slotAuthError(const QString &message, AuthEnums::Error error, int result) {
@@ -530,10 +574,6 @@ namespace SDDM {
         // greeter
         if (status != AuthEnums::HELPER_AUTH_ERROR)
             stop();
-
-        // Start the greeter again as soon as the user session is closed
-        if (m_auth->user() != QLatin1String("sddm"))
-            m_greeter->start();
     }
 
     /* got new request (with prompts) from pam conv(), e.g. for expired pwd
@@ -572,7 +612,10 @@ namespace SDDM {
     }
 
     void Display::slotSessionStarted(bool success) {
-        qDebug() << "Session started";
+        qDebug() << "Session started" << success;
+        if (success) {
+            QTimer::singleShot(5000, m_greeter, &Greeter::stop);
+        }
     }
 
     // inform daemon if greeter stopped, so we dont forward

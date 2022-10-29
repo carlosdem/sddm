@@ -309,7 +309,7 @@ namespace SDDM {
         m_started = false;
 
         // log message
-        qDebug() << "Greeter stopped.";
+        qDebug() << "Greeter stopped." << status;
 
         // clean up
         m_auth->deleteLater();
@@ -322,17 +322,22 @@ namespace SDDM {
         emit stopped();
     }
 
+    bool Greeter::isRunning() const {
+        return (m_process && m_process->state() == QProcess::Running)
+            || (m_auth && m_auth->isActive());
+    }
+
     void Greeter::onReadyReadStandardError()
     {
         if (m_process) {
-            qDebug() << "Greeter errors:" << qPrintable(QString::fromLocal8Bit(m_process->readAllStandardError()));
+            qDebug() << "Greeter errors:" << m_process->readAllStandardError().constData();
         }
     }
 
     void Greeter::onReadyReadStandardOutput()
     {
         if (m_process) {
-            qDebug() << "Greeter output:" << qPrintable(QString::fromLocal8Bit(m_process->readAllStandardOutput()));
+            qDebug() << "Greeter output:" << m_process->readAllStandardOutput().constData();
         }
     }
 
