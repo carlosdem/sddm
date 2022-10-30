@@ -48,15 +48,12 @@ namespace SDDM {
         void loginFailed(QLocalSocket *socket, const QString &message, int result);
         void pamConvMsg(QLocalSocket *socket, const QString &message, int result);
         void pamRequest(QLocalSocket *socket, const AuthRequest * const request);
+        void informationMessage(QLocalSocket *socket, const QString &message);
+
 
     private slots:
         void newConnection();
         void readyRead();
-
-    public slots:
-        void informationMessage(QLocalSocket *socket, const QString &message);
-        void loginFailed(QLocalSocket *socket);
-        void loginSucceeded(QLocalSocket *socket);
 
     signals:
         // from greeter to (pam) backend

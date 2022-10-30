@@ -513,9 +513,10 @@ namespace SDDM {
         qWarning().noquote().nospace() << "Authentication information: message = \"" << message
                                        << "\", type = " << Utils::authInfoString(info)
                                        << ", result = " << Utils::pamResultString(result)
-                                       << " (rc=" << result << ")";
-    void Display::slotAuthInfo(const QString &message, Auth::Info info) {
-        qWarning() << "Authentication information:" << info << message;
+                                       << " (rc=" << result << ")";//}
+
+    //void Display::slotAuthInfo(const QString &message, AuthEnums::Info info) {
+      //  qWarning() << "Authentication information:" << info << message;
 
         if(!m_socket) {
             qWarning() << "Greeter socket down";
@@ -530,8 +531,9 @@ namespace SDDM {
         m_socketServer->informationMessage(m_socket, message);
     }
 
-    void Display::slotAuthError(const QString &message, Auth::Error error) {
-        qWarning() << "Authentication error:" << error << message;
+        void Display::slotAuthError(const QString &message, AuthEnums::Error error, int result) {
+
+        /*qWarning() << "Authentication error:" << error << message;
 
         if (!m_socket)
             return;
@@ -542,7 +544,7 @@ namespace SDDM {
     }
 
     void Display::slotAuthError(const QString &message, AuthEnums::Error error, int result) {
-
+*/
         qWarning().noquote().nospace() << "Authentication error: message = \"" << message
                                        << "\", type = " << Utils::authErrorString(error)
                                        << ", result = " << Utils::pamResultString(result)
@@ -555,6 +557,10 @@ namespace SDDM {
             qWarning() << "Greeter socket down!";
             return;
         }
+
+        m_socketServer->informationMessage(m_socket, message);
+        if (error == AuthEnums::ERROR_AUTHENTICATION)
+            emit loginFailed(m_socket, message, result);
 
         // failed login only when result not PAM_SUCCESS,
         // i.e. error is of type ERROR_AUTHENTICATION
@@ -625,3 +631,4 @@ namespace SDDM {
         m_socket = nullptr;
     }
 }
+

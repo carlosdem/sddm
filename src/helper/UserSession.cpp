@@ -117,7 +117,7 @@ namespace SDDM {
                 }
             }
         } else {
-            Q_EMIT finished(Auth::HELPER_OTHER_ERROR);
+            Q_EMIT finished(AuthEnums::HELPER_OTHER_ERROR);
         }
 
         Q_EMIT finished(AuthEnums::HELPER_OTHER_ERROR);
@@ -180,11 +180,11 @@ namespace SDDM {
             // take control of the tty
             if (takeControl) {
                 if (ioctl(STDIN_FILENO, TIOCSCTTY) < 0) {
-                    qCritical("Failed to take control of %s: %s", qPrintable(ttyString), strerror(errno));
-                    exit(AuthEnums::HELPER_OTHER_ERROR);
+                    //qCritical("Failed to take control of %s: %s", qPrintable(ttyString), strerror(errno));
+                    //exit(AuthEnums::HELPER_OTHER_ERROR);
                     const auto error = strerror(errno);
                     qCritical().nospace() << "Failed to take control of " << ttyString << " (" << QFileInfo(ttyString).owner() << "): " << error;
-                    exit(Auth::HELPER_OTHER_ERROR);
+                    exit(AuthEnums::HELPER_OTHER_ERROR);
                 }
             }
 
@@ -216,11 +216,9 @@ namespace SDDM {
         if (bufsize == -1)
             bufsize = 16384;
         QScopedPointer<char, QScopedPointerPodDeleter> buffer(static_cast<char*>(malloc(bufsize)));
-        if (buffer.isNull())
-            exit(AuthEnums::HELPER_OTHER_ERROR);
         if (buffer.isNull()) {
             qCritical() << "Could not allocate buffer of size" << bufsize;
-            exit(Auth::HELPER_OTHER_ERROR);
+            exit(AuthEnums::HELPER_OTHER_ERROR);
         }
         int err = getpwnam_r(username.constData(), &pw, buffer.data(), bufsize, &rpw);
         if (rpw == NULL) {
