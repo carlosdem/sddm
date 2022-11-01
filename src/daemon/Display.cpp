@@ -158,6 +158,12 @@ namespace SDDM {
             fingerprintLogin();
         });
 
+        // connect facial recognition signal
+        connect(m_socketServer, &SocketServer::connected, [this](QLocalSocket* socket){
+            m_socket = socket;
+            facialrecognitionLogin();
+        });
+
         // connect login result signals
         connect(this, &Display::loginFailed, m_socketServer, &SocketServer::loginFailed);
         connect(this, &Display::loginSucceeded, m_socketServer, &SocketServer::loginSucceeded);
@@ -262,6 +268,34 @@ namespace SDDM {
         return true;
     }
 
+        bool Display::facialrecognitionLogin(){
+        if(mainConfig.FacialRecognition login.User.get().isEmpty()){
+            return false;
+        }
+
+        Session::Type sessionType = Session::X11Session;
+
+        QString facialrecognitionSession = mainConfig.FacialRecognition login.Session.get();
+        if(facialrecognitionSession.isEmpty()){
+            facialrecognitionSession = stateConfig.Last.Session.get();
+        }
+        if (findSessionEntry(mainConfig.X11.SessionDir.get(), facialrecognitionSession)) {
+            sessionType = Session::X11Session;
+        } else if (findSessionEntry(mainConfig.Wayland.SessionDir.get(), facialrecognitionSession)) {
+            sessionType = Session::WaylandSession;
+        } else {
+            qCritical() << "Unable to find facial recognition session entry" << facialrecognitionSession;
+            return false;
+        }
+        Session session;
+        session.setTo(sessionType, facialrecognitionSession);
+
+        m_auth->setFacialRecognition login(true);
+        startAuth(mainConfig.FacialRecognition login.User.get(), QString(), session);
+        m_auth->setFacialRecognition login(false);
+        return true;
+    }
+
     void Display::displayServerStarted() {
         // check flag
         if (m_started)
@@ -360,6 +394,11 @@ namespace SDDM {
         if(password.isEmpty() && !m_auth->fingerprintlogin()){
             qDebug() << "use fingerprint because password is empty";
             m_auth->setFingerprintlogin(true);
+        }
+
+        if(password.isEmpty() && !m_auth->facialrecognitionlogin()){
+            qDebug() << "use facial recognition because password is empty";
+            m_auth->setFacialRecognition login(true);
         }
 
         // authenticate

@@ -54,6 +54,7 @@ namespace SDDM {
         // not setting NOTIFY for the properties - they should be set only once before calling start
         Q_PROPERTY(bool autologin READ autologin WRITE setAutologin NOTIFY autologinChanged)
         Q_PROPERTY(bool fingerprintlogin READ fingerprintlogin WRITE setFingerprintlogin NOTIFY fingerprintloginChanged)
+        Q_PROPERTY(bool facialrecognitionlogin READ facialrecognitionlogin WRITE setFacialRecognition login NOTIFY facialrecognitionloginChanged)
         Q_PROPERTY(bool greeter READ isGreeter WRITE setGreeter NOTIFY greeterChanged)
         Q_PROPERTY(bool verbose READ verbose WRITE setVerbose NOTIFY verboseChanged)
         Q_PROPERTY(QString cookie READ cookie WRITE setCookie NOTIFY cookieChanged)
@@ -69,6 +70,7 @@ namespace SDDM {
 
         bool autologin() const;
         bool fingerprintlogin() const;
+        bool facialrecognitionlogin() const;
         bool isGreeter() const;
         bool verbose() const;
         const QString &cookie() const;
@@ -108,6 +110,13 @@ namespace SDDM {
         * @param on true if should use fingerprint login
         */
         void setFingerprintlogin(bool on = true);
+
+        /**
+        * Set mode to facial recognition login.
+        * Ignored if session is not started
+        * @param on true if should use facial recognition login
+        */
+        void setFacialRecognition login(bool on = true);
 
         /**
          * Set mode to greeter
@@ -159,6 +168,7 @@ namespace SDDM {
     Q_SIGNALS:
         void autologinChanged();
         void fingerprintloginChanged();
+        void facialrecognitionloginChanged();
         void greeterChanged();
         void verboseChanged();
         void cookieChanged();

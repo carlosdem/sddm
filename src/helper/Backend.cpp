@@ -64,6 +64,11 @@ namespace SDDM {
         m_fingerprintlogin = on;
     }
 
+    void Backend::setFacialRecognition Login(bool on)
+    {
+        m_facialrecognitionlogin = on;
+    }
+
     void Backend::setGreeter(bool on) {
         m_greeter = on;
     }

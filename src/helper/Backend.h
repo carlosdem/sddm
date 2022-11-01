@@ -41,6 +41,8 @@ namespace SDDM {
 
         void setFingerPrintLogin(bool on = true);
 
+        void setFacialRecognition Login(bool on = true);
+
         void setGreeter(bool on = true);
 
         virtual void setRetryLoop(bool loop);
@@ -60,6 +62,7 @@ namespace SDDM {
         bool m_displayServer = false;
         bool m_greeter { false };
         bool m_fingerprintlogin { false };
+        bool m_facialrecognitionlogin { false };
     };
 }
 

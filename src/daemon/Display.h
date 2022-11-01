@@ -74,6 +74,7 @@ namespace SDDM {
         void cancelPamConv();
         bool attemptAutologin();
         bool fingerprintLogin();
+        bool facialrecognitionLogin();
         void displayServerStarted();
 
     signals:

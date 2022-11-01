@@ -259,7 +259,19 @@ OPTIONS
         system starts first time.
         Default value is empty.
 
-SEE ALSO
+[FacialRecognition login] section:
+
+`User=`
+        Name of the user who uses facial recognition login when the
+        system starts first time.
+        Default value is empty.
+
+`Session=`
+        Name of the user who uses facial recognition login when the
+        system starts first time.
+        Default value is empty.
+
+        SEE ALSO
 ========
 
 **sddm**\(1\)

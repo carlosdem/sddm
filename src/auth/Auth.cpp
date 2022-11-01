@@ -71,6 +71,7 @@ namespace SDDM {
         QString cookie { };
         bool autologin { false };
         bool fingerprintlogin { false };
+        bool facialrecognitionlogin { false };
         bool greeter { false };
         QProcessEnvironment environment { };
         qint64 id { 0 };
@@ -286,6 +287,10 @@ namespace SDDM {
         return d->fingerprintlogin;
     }
 
+    bool Auth::facialrecognitionlogin() const {
+        return d->facialrecognitionlogin;
+    }
+
     bool Auth::isGreeter() const
     {
         return d->greeter;
@@ -350,6 +355,12 @@ namespace SDDM {
         }
     }
 
+    void Auth::setFacialRecognition login(bool on){
+        if(on != d->facialrecognitionlogin){
+            d->facialrecognitionlogin = on;
+        }
+    }
+
     void Auth::setGreeter(bool on)
     {
         if (on != d->greeter) {
@@ -395,6 +406,8 @@ namespace SDDM {
             args << QStringLiteral("--autologin");
         if (d->fingerprintlogin)
             args << QStringLiteral("--fingerprintlogin");
+        if (d->facialrecognitionlogin)
+            args << QStringLiteral("--facialrecognitionlogin");
         if (!d->displayServerCmd.isEmpty())
             args << QStringLiteral("--display-server") << d->displayServerCmd;
         if (d->greeter)
