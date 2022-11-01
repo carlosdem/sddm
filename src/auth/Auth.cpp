@@ -224,9 +224,6 @@ namespace SDDM {
 
         if (exitCode == AuthEnums::HELPER_SUCCESS)
             qDebug() << "Auth: sddm-helper exited successfully";
-            emit qobject_cast<Auth*>(parent())->finished(static_cast<Auth::HelperExitStatus>(exitCode));
-        }
-
         else
             qWarning("Auth: sddm-helper exited with %d", exitCode);
 

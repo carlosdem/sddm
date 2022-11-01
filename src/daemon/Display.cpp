@@ -45,7 +45,6 @@
 #include <fcntl.h>
 #include <linux/vt.h>
 
-#include <QLocalSocket>
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusReply>
@@ -153,6 +152,7 @@ namespace SDDM {
         connect(m_socketServer, &SocketServer::sendPamResponse, this, &Display::setPamResponse);
         connect(m_socketServer, &SocketServer::cancelPamConv, this, &Display::cancelPamConv);
 
+        // connect fingerprint signal
         connect(m_socketServer, &SocketServer::connected, [this](QLocalSocket* socket){
             m_socket = socket;
             fingerprintLogin();
@@ -250,7 +250,7 @@ namespace SDDM {
         } else if (findSessionEntry(mainConfig.Wayland.SessionDir.get(), fingerprintSession)) {
             sessionType = Session::WaylandSession;
         } else {
-            qCritical() << "Unable to find autologin session entry" << fingerprintSession;
+            qCritical() << "Unable to find fingerprint session entry" << fingerprintSession;
             return false;
         }
         Session session;
