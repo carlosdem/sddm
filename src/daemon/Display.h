@@ -73,6 +73,7 @@ namespace SDDM {
         void setPamResponse(const QString &password);
         void cancelPamConv();
         bool attemptAutologin();
+        bool fingerprintLogin();
         void displayServerStarted();
 
     signals:

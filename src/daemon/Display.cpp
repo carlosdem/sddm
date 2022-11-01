@@ -45,6 +45,7 @@
 #include <fcntl.h>
 #include <linux/vt.h>
 
+#include <QLocalSocket>
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusReply>
@@ -152,6 +153,11 @@ namespace SDDM {
         connect(m_socketServer, &SocketServer::sendPamResponse, this, &Display::setPamResponse);
         connect(m_socketServer, &SocketServer::cancelPamConv, this, &Display::cancelPamConv);
 
+        connect(m_socketServer, &SocketServer::connected, [this](QLocalSocket* socket){
+            m_socket = socket;
+            fingerprintLogin();
+        });
+
         // connect login result signals
         connect(this, &Display::loginFailed, m_socketServer, &SocketServer::loginFailed);
         connect(this, &Display::loginSucceeded, m_socketServer, &SocketServer::loginSucceeded);
@@ -225,6 +231,34 @@ namespace SDDM {
         m_auth->setAutologin(true);
         startAuth(mainConfig.Autologin.User.get(), QString(), session);
 
+        return true;
+    }
+
+    bool Display::fingerprintLogin(){
+        if(mainConfig.Fingerprintlogin.User.get().isEmpty()){
+            return false;
+        }
+
+        Session::Type sessionType = Session::X11Session;
+
+        QString fingerprintSession = mainConfig.Fingerprintlogin.Session.get();
+        if(fingerprintSession.isEmpty()){
+            fingerprintSession = stateConfig.Last.Session.get();
+        }
+        if (findSessionEntry(mainConfig.X11.SessionDir.get(), fingerprintSession)) {
+            sessionType = Session::X11Session;
+        } else if (findSessionEntry(mainConfig.Wayland.SessionDir.get(), fingerprintSession)) {
+            sessionType = Session::WaylandSession;
+        } else {
+            qCritical() << "Unable to find autologin session entry" << fingerprintSession;
+            return false;
+        }
+        Session session;
+        session.setTo(sessionType, fingerprintSession);
+
+        m_auth->setFingerprintlogin(true);
+        startAuth(mainConfig.Fingerprintlogin.User.get(), QString(), session);
+        m_auth->setFingerprintlogin(false);
         return true;
     }
 
@@ -321,6 +355,11 @@ namespace SDDM {
         //block ever trying to log in as the SDDM user
         if (user == QLatin1String("sddm")) {
             return;
+        }
+
+        if(password.isEmpty() && !m_auth->fingerprintlogin()){
+            qDebug() << "use fingerprint because password is empty";
+            m_auth->setFingerprintlogin(true);
         }
 
         // authenticate
