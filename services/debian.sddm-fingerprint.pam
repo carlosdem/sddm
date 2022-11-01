@@ -1,7 +1,7 @@
 #%PAM-1.0
 
 auth    required        pam_permit.so
-auth    required	pam_fprintd.so
+auth    required		pam_fprintd.so
 
 @include common-account
 
@@ -22,7 +22,7 @@ session [success=ok ignore=ignore module_unknown=ignore default=bad] pam_selinux
 # Can't change password
 #password        required pam_deny.so
 password required  pam_fprintd.so
-//password optional  pam_permit.so
+#password optional  pam_permit.so
 # From the pam_env man page
 # Since setting of PAM environment variables can have side effects to other modules, this module should be the last one on the stack.
 
