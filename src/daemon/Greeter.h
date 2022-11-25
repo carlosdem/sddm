@@ -66,6 +66,7 @@ namespace SDDM {
 
     signals:
         void failed();
+        void displayServerFailed();
 
     private:
         bool m_started { false };
