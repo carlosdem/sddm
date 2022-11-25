@@ -205,54 +205,8 @@ namespace SDDM {
                 daemonApp->powerManager()->hybridSleep();
             }
             break;
-            default: {
-                qWarning() << logPrefix << "Unknown message" << message;
-                    // emit signal
-                    emit login(socket, user, password, session);
-                }
-                break;
-                case GreeterMessages::PowerOff: {
-                    // log message
-                    qDebug() << "Message received from greeter: PowerOff";
-
-                    // power off
-                    daemonApp->powerManager()->powerOff();
-                }
-                break;
-                case GreeterMessages::Reboot: {
-                    // log message
-                    qDebug() << "Message received from greeter: Reboot";
-
-                    // reboot
-                    daemonApp->powerManager()->reboot();
-                }
-                break;
-                case GreeterMessages::Suspend: {
-                    // log message
-                    qDebug() << "Message received from greeter: Suspend";
-
-                    // suspend
-                    daemonApp->powerManager()->suspend();
-                }
-                break;
-                case GreeterMessages::Hibernate: {
-                    // log message
-                    qDebug() << "Message received from greeter: Hibernate";
-
-                    // hibernate
-                    daemonApp->powerManager()->hibernate();
-                }
-                break;
-                case GreeterMessages::HybridSleep: {
-                    // log message
-                    qDebug() << "Message received from greeter: HybridSleep";
-
-                    // hybrid sleep
-                    daemonApp->powerManager()->hybridSleep();
-                }
-                break;
                 case GreeterMessages::KeyboardLayout: {
-                    qDebug() << "Message received from greeter: Keyboard Layout switch";
+                    qDebug() << logPrefix << "Keyboard Layout switch";
 
                     // read username, pasword etc.
                     QString layout;
@@ -263,7 +217,7 @@ namespace SDDM {
                 break;
                 default: {
                     // log message
-                    qWarning() << "Unknown message" << message;
+                    qWarning() << logPrefix << "Unknown message" << message;
                 }
             }
         }
