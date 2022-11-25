@@ -33,7 +33,8 @@ namespace SDDM {
         Reboot,
         Suspend,
         Hibernate,
-        HybridSleep
+        HybridSleep,
+        KeyboardLayout,
     };
 
     /** greeter to daemon messages */

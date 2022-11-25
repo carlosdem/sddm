@@ -66,6 +66,33 @@ namespace SDDM {
         explicit Auth(QObject *parent);
         ~Auth();
 
+/*      enum Info {
+            INFO_NONE = 0,
+            INFO_UNKNOWN,
+            INFO_PASS_CHANGE_REQUIRED,
+            _INFO_LAST
+        };
+        Q_ENUM(Info)
+
+        enum Error {
+            ERROR_NONE = 0,
+            ERROR_UNKNOWN,
+            ERROR_AUTHENTICATION,
+            ERROR_INTERNAL,
+            _ERROR_LAST
+        };
+        Q_ENUM(Error)
+
+        enum HelperExitStatus {
+            HELPER_SUCCESS = 0,
+            HELPER_AUTH_ERROR,
+            HELPER_SESSION_ERROR,
+            HELPER_OTHER_ERROR,
+            HELPER_DISPLAYSERVER_ERROR,
+        };
+        Q_ENUM(HelperExitStatus)
+
+*/
         static void registerTypes();
 
         bool autologin() const;

@@ -20,6 +20,7 @@ set(GREETER_SOURCES
     GreeterProxy.cpp
     KeyboardLayout.cpp
     KeyboardModel.cpp
+    KeyboardBackend.cpp
     ScreenModel.cpp
     SessionModel.cpp
     UserModel.cpp

@@ -1,5 +1,5 @@
 /***************************************************************************
-* Copyright (c) 2013 Abdurrahman AVCI <abdurrahmanavci@gmail.com>
+* Copyright (c) 2022 Aleix Pol Gonzalez <aleixpol@kde.org>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -17,38 +17,15 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ***************************************************************************/
 
-#ifndef SDDM_SEAT_H
-#define SDDM_SEAT_H
+#include "KeyboardBackend.h"
+#include "KeyboardModel_p.h"
 
-#include <QObject>
-#include <QVector>
-#include "Display.h"
+namespace SDDM
+{
 
-namespace SDDM {
-    class Display;
-
-    class Seat : public QObject {
-        Q_OBJECT
-        Q_DISABLE_COPY(Seat)
-    public:
-        explicit Seat(const QString &name, QObject *parent = 0);
-
-        const QString &name() const;
-        void createDisplay(Display::DisplayServerType serverType);
-
-    public slots:
-        void removeDisplay(SDDM::Display* display);
-
-    private slots:
-        void displayStopped();
-
-    private:
-        void startDisplay(SDDM::Display *display, int tryNr = 1);
-
-        QString m_name;
-
-        QVector<Display *> m_displays;
-    };
+void KeyboardBackend::setProxy(GreeterProxy* proxy)
+{
+    d->m_proxy = proxy;
 }
 
-#endif // SDDM_SEAT_H
+}

@@ -315,7 +315,9 @@ namespace SDDM {
         m_auth->deleteLater();
         m_auth = nullptr;
 
+
         if (status == AuthEnums::HELPER_SESSION_ERROR) {
+
             Q_EMIT failed();
         }
 
