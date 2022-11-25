@@ -269,13 +269,13 @@ namespace SDDM {
     }
 
         bool Display::facialrecognitionLogin(){
-        if(mainConfig.FacialRecognition login.User.get().isEmpty()){
+        if(mainConfig.FacialRecognitionlogin.User.get().isEmpty()){
             return false;
         }
 
         Session::Type sessionType = Session::X11Session;
 
-        QString facialrecognitionSession = mainConfig.FacialRecognition login.Session.get();
+        QString facialrecognitionSession = mainConfig.FacialRecognitionlogin.Session.get();
         if(facialrecognitionSession.isEmpty()){
             facialrecognitionSession = stateConfig.Last.Session.get();
         }
@@ -290,9 +290,9 @@ namespace SDDM {
         Session session;
         session.setTo(sessionType, facialrecognitionSession);
 
-        m_auth->setFacialRecognition login(true);
-        startAuth(mainConfig.FacialRecognition login.User.get(), QString(), session);
-        m_auth->setFacialRecognition login(false);
+        m_auth->setFacialRecognitionlogin(true);
+        startAuth(mainConfig.FacialRecognitionlogin.User.get(), QString(), session);
+        m_auth->setFacialRecognitionlogin(false);
         return true;
     }
 
@@ -391,14 +391,16 @@ namespace SDDM {
             return;
         }
 
+        /*
         if(password.isEmpty() && !m_auth->fingerprintlogin()){
             qDebug() << "use fingerprint because password is empty";
             m_auth->setFingerprintlogin(true);
         }
+        */
 
         if(password.isEmpty() && !m_auth->facialrecognitionlogin()){
             qDebug() << "use facial recognition because password is empty";
-            m_auth->setFacialRecognition login(true);
+            m_auth->setFacialRecognitionlogin(true);
         }
 
         // authenticate

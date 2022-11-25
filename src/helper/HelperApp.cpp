@@ -125,7 +125,7 @@ namespace SDDM {
         }
 
         if((pos = args.indexOf(QStringLiteral("--facialrecognitionlogin"))) >= 0) {
-            m_backend->setFacialRecognition Login(true);
+            m_backend->setFacialRecognitionLogin(true);
         }
 
         if ((pos = args.indexOf(QStringLiteral("--greeter"))) >= 0) {

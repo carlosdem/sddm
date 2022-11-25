@@ -41,7 +41,7 @@ namespace SDDM {
 
         void setFingerPrintLogin(bool on = true);
 
-        void setFacialRecognition Login(bool on = true);
+        void setFacialRecognitionLogin(bool on = true);
 
         void setGreeter(bool on = true);
 

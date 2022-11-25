@@ -168,6 +168,7 @@ namespace SDDM {
         if (m_result == PAM_SUCCESS) {
             if(m_workState == STATE_CREDITED)
                 m_workState = STATE_SESSION_STARTED;
+            qDebug() << "[PAM] session started.";
         } else
             qWarning() << "[PAM] openSession:" << pam_strerror(m_handle, m_result);
         m_open = m_result == PAM_SUCCESS;
@@ -189,6 +190,7 @@ namespace SDDM {
 
     bool PamHandle::setItem(int item_type, const void* item) {
         m_result = pam_set_item(m_handle, item_type, item);
+            qDebug() << "[PAM] setItem:" << pam_strerror(m_handle, m_result);
         if (m_result != PAM_SUCCESS) {
             qWarning() << "[PAM] setItem:" << pam_strerror(m_handle, m_result);
         }
@@ -198,6 +200,7 @@ namespace SDDM {
     const void* PamHandle::getItem(int item_type) {
         const void *item;
         m_result = pam_get_item(m_handle, item_type, &item);
+            qDebug() << "[PAM] getItem:" << pam_strerror(m_handle, m_result);
         if (m_result != PAM_SUCCESS) {
             qWarning() << "[PAM] getItem:" << pam_strerror(m_handle, m_result);
         }

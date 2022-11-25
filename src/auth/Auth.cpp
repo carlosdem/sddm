@@ -355,7 +355,7 @@ namespace SDDM {
         }
     }
 
-    void Auth::setFacialRecognition login(bool on){
+    void Auth::setFacialRecognitionlogin(bool on){
         if(on != d->facialrecognitionlogin){
             d->facialrecognitionlogin = on;
         }

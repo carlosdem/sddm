@@ -202,8 +202,16 @@ namespace SDDM {
         */
         QString errorString();
 
+        /**
+        * Generates an info message according to the reply
+        *
+        * \return success string
+        */
+        QString infoString();
+
     signals:
         void error(const QString &errmsg, AuthEnums::Error, int result);
+        void info(const QString &infomsg, AuthEnums::Info, int result);
 
     private:
         /**

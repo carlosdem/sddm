@@ -259,7 +259,7 @@ OPTIONS
         system starts first time.
         Default value is empty.
 
-[FacialRecognition login] section:
+[FacialRecognitionlogin] section:
 
 `User=`
         Name of the user who uses facial recognition login when the

@@ -115,7 +115,7 @@ namespace SDDM {
             Entry(Session,             QString,     QString(),                                  _S("Name of session file for fingerprint login session (if empty try last logged in)"));
         );
 
-        Section(FacialRecognition login,
+        Section(FacialRecognitionlogin,
             Entry(User,                QString,     QString(),                                  _S("Username for default user"));
             Entry(Session,             QString,     QString(),                                  _S("Name of session file for facial recognition login session (if empty try last logged in)"));
         );

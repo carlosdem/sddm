@@ -182,6 +182,8 @@ namespace SDDM {
             QStringLiteral("PAM_PROMPT_ECHO_ON"),
             QStringLiteral("PAM_ERROR_MSG"),
             QStringLiteral("PAM_TEXT_INFO"),
+            QStringLiteral("PAM_RADIO_TYPE"),
+            QStringLiteral("PAM_BINARY_PROMPT"),
             QStringLiteral("UNKNOWN"),
         };
 
@@ -194,10 +196,13 @@ namespace SDDM {
                 return msgStyle[2]; break;
             case PAM_TEXT_INFO:
                 return msgStyle[3]; break;
+            case PAM_RADIO_TYPE:
+                return msgStyle[4]; break;
+            case PAM_BINARY_PROMPT:
+                return msgStyle[5]; break;
             default: break;
         }
-
-        return msgStyle[4];
+        return msgStyle[6];
     }
 
     /** \internal Get string representation of AuthEnum Info for debug logging */
