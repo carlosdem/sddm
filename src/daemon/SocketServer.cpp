@@ -116,20 +116,23 @@ namespace SDDM {
         // input stream
         QDataStream input(socket);
 
-        // read message
-        quint32 message;
-        input >> message;
+        // Qt's QLocalSocket::readyRead is not designed to be called at every socket.write(), 
+        // so we need to use a loop to read all the signals.
+        while(socket->bytesAvailable()) {
+            // read message
+            quint32 message;
+            input >> message;
 
         switch (GreeterMessages(message)) {
             case GreeterMessages::Connect: {
                 // log message
                 qDebug() << logPrefix << "Connect";
 
-                // send capabilities
-                SocketWriter(socket) << quint32(DaemonMessages::Capabilities) << quint32(daemonApp->powerManager()->capabilities());
+                    // send capabilities
+                    SocketWriter(socket) << quint32(DaemonMessages::Capabilities) << quint32(daemonApp->powerManager()->capabilities());
 
-                // send host name
-                SocketWriter(socket) << quint32(DaemonMessages::HostName) << daemonApp->hostName();
+                    // send host name
+                    SocketWriter(socket) << quint32(DaemonMessages::HostName) << daemonApp->hostName();
 
                 // emit signal
                 emit connected(socket);
@@ -139,10 +142,10 @@ namespace SDDM {
                 // log message
                 qDebug() << logPrefix << "Login";
 
-                // read username, pasword etc.
-                QString user, password, filename;
-                Session session;
-                input >> user >> password >> session;
+                    // read username, pasword etc.
+                    QString user, password, filename;
+                    Session session;
+                    input >> user >> password >> session;
 
                 // emit signal
                 emit login(socket, user, password, session);
@@ -202,10 +205,23 @@ namespace SDDM {
                 daemonApp->powerManager()->hybridSleep();
             }
             break;
-            default: {
-                qWarning() << logPrefix << "Unknown message" << message;
+                case GreeterMessages::KeyboardLayout: {
+                    qDebug() << logPrefix << "Keyboard Layout switch";
+
+                    // read username, pasword etc.
+                    QString layout;
+                    input >> layout;
+
+                    daemonApp->setKeyboardLayout(layout);
+                }
+                break;
+                default: {
+                    // log message
+                    qWarning() << logPrefix << "Unknown message" << message;
+                }
             }
         }
+
     }
 
     // from (pam) backend to greeter
